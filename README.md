@@ -7,3 +7,9 @@
 欢迎前来参观!!!!
 
 我可是蔚蓝档案死忠粉哦  ヽ( ^ω^ ゞ )
+
+用的主题分别是：
+
+https://github.com/matsuzaka-yuki/Mizuki  Mizuki大佬的Astro主题
+
+https://github.com/forever218/hexo-theme-magzine  forever218大佬的hexo主题
