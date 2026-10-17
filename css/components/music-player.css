@@ -1,0 +1,898 @@
+/*=====Music Player Styles=====*/
+.music-player {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 999;
+    font-family: var(--font-primary);
+    -webkit-user-select: none;
+    user-select: none;
+    /* ★ 默认隐藏:JS 完成"嵌入导航栏/悬浮/模态"定位后(加对应类)才显示,
+       否则首次进入会在左下角先画一帧默认位置的播放器再消失(闪现) */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.music-player.in-header,
+.music-player.is-floating,
+.music-player.in-modal-mode {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 旋转动画相关 */
+@keyframes spin-cover {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.music-player-cover img,
+.music-player-pill-cover img {
+    border-radius: 50%;
+    animation: spin-cover 8s linear infinite;
+    animation-play-state: paused;
+}
+
+.music-player.playing .music-player-cover img,
+.music-player.playing .music-player-pill-cover img {
+    animation-play-state: running;
+}
+
+
+/* ===== UI 定位：嵌入 Header ===== */
+.music-player.in-header {
+    position: relative;
+    left: auto !important;
+    bottom: auto !important;
+    top: auto !important;
+    right: auto !important;
+    margin-left: 20px;
+    z-index: 10;
+}
+
+.music-player.in-header .music-player-toggle,
+.music-player.in-header .music-player-collapse,
+.music-player.in-header .music-player-pill-collapse {
+    display: none !important;
+}
+
+.music-player.in-header .music-player-mini {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+}
+
+.music-player.in-header .music-player-title,
+.music-player.in-header .music-player-pill-title {
+    color: var(--text-color);
+}
+
+/* ===== UI 定位：自由浮动 ===== */
+.music-player.is-floating {
+    bottom: auto;
+    right: auto;
+    cursor: move;
+}
+
+
+/* ===== Card Player (卡片型样式) ===== */
+.music-player-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(var(--card-bg-rgb, 255, 255, 255), var(--player-opacity, 0.85));
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-normal);
+    max-width: 380px;
+}
+
+/* ★ 悬浮/嵌入的卡片:信息区定宽 150px 后总宽超过旧上限 380px,
+   放宽到 460px,控制键不再溢出卡片背景 */
+.music-player.in-header .music-player-card,
+.music-player.is-floating:not(.in-modal-mode) .music-player-card {
+    max-width: 460px;
+}
+
+.music-player-card:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.16);
+    transform: translateY(-2px);
+}
+
+.music-player.is-floating .music-player-card:hover,
+.music-player.is-floating .music-player-pill:hover {
+    transform: none;
+}
+
+.music-player-cover {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.music-player-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.music-player-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* ★ 卡片型信息区定宽(与圆条型 150px 对齐):嵌入导航栏/悬浮形态下
+   播放器长度不随歌曲名变化;模态窗口不受影响(flex:1 原样) */
+.music-player.in-header .music-player-info,
+.music-player.is-floating:not(.in-modal-mode) .music-player-info {
+    flex: 0 0 150px;
+    width: 150px;
+}
+
+.music-player-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.music-player-artist {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.music-player-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.music-player-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--primary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    /* ★★★ 添加相对定位供 Tooltip 使用 ★★★ */
+    position: relative;
+}
+
+.music-player-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.music-player-play {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 0.875rem;
+}
+
+.music-player-play:hover {
+    background: var(--accent-color);
+    filter: brightness(1.1);
+}
+
+/* ===== Pill Player (圆条型样式) ===== */
+.music-player-pill {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: rgba(var(--card-bg-rgb, 255, 255, 255), var(--player-opacity, 0.85));
+    border-radius: 999px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-normal);
+}
+
+.music-player-pill:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.16);
+    transform: translateY(-2px);
+}
+
+.music-player-pill-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.music-player-pill .music-player-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+}
+
+.music-player-pill .music-player-play {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-color);
+    color: white;
+}
+
+.music-player-pill-cover {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.music-player-pill-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.music-player-pill-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-color);
+    margin: 0 6px;
+    flex-shrink: 0;
+}
+
+.music-player-pill-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* ★ 基础上限 120px;嵌入/悬浮形态由下方规则改为定宽 150px
+       (定宽不能写在这里:模态窗口是纵向布局,flex-basis 会变成高度) */
+    max-width: 120px;
+    margin-right: 2px;
+}
+
+/* ★ 嵌入/悬浮形态:信息区定宽 150px,播放器长度恒定且能展示较长歌名;
+   不作用于模态窗口(其纵向布局下 flex-basis 会变成高度,导致面板过长) */
+.music-player.in-header:not(.in-modal-mode) .music-player-pill-info,
+.music-player.is-floating:not(.in-modal-mode) .music-player-pill-info {
+    width: 150px;
+    flex: 0 0 150px;
+}
+
+.music-player-pill-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.music-player-pill-artist {
+    font-size: 0.7rem;
+    color: var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.music-player.style-card .music-player-pill {
+    display: none;
+}
+
+.music-player.style-pill .music-player-card {
+    display: none;
+}
+
+.music-player-audio {
+    display: none;
+}
+
+/* ===== Dark Mode ===== */
+body.dark-mode .music-player-card,
+body.dark-mode .music-player-pill {
+    background: rgba(38, 38, 38, var(--player-opacity, 0.85));
+    border-color: #333333;
+}
+
+body.dark-mode .music-player.in-header .music-player-title,
+body.dark-mode .music-player.in-header .music-player-pill-title {
+    color: #eee;
+}
+
+body.dark-mode .music-player.in-header .music-player-card,
+body.dark-mode .music-player.in-header .music-player-pill {
+    background: transparent;
+    border: none;
+}
+
+body.dark-mode .music-player-pill-divider {
+    background: #444444;
+}
+
+/* ===== Collapsed State (Default) ===== */
+.music-player.collapsed .music-player-mini {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin-top: -24px;
+}
+
+.music-player-toggle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent-color);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-normal);
+    z-index: 1000;
+    font-size: 1.1rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+}
+
+.music-player-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+
+.music-player-toggle:active {
+    transform: scale(0.95);
+}
+
+.music-player.collapsed .music-player-toggle {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+body.dark-mode .music-player-toggle {
+    background: var(--accent-color);
+}
+
+
+/* =========================================================
+   ★★★ 强制模态模式 (完全覆盖内联与原有样式) ★★★ 
+========================================================= */
+
+.music-player.in-modal-mode {
+    position: fixed !important;
+    right: 20px !important;
+    left: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    z-index: 2000 !important;
+    cursor: default !important;
+    transition: right 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+}
+
+body.dark-mode .music-player.in-modal-mode .music-player-mini {
+    background: rgba(38, 38, 38, var(--player-opacity, 0.85)) !important;
+    border-color: #333333 !important;
+}
+
+/* 找到这部分并进行修改： */
+.music-player.in-modal-mode .music-player-pill-info {
+    text-align: center !important;
+    /* 将原本的 max-width: 90px 改为用 em 单位限制为大约3个字的宽度 */
+    max-width: 3.5em !important;
+    margin: 0 !important;
+}
+
+
+/* 添加针对标题和歌手的严格单行截断（继承省略号属性） */
+.music-player.in-modal-mode .music-player-pill-title,
+.music-player.in-modal-mode .music-player-pill-artist {
+    width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+body.dark-mode .music-player.in-modal-mode .music-player-title,
+body.dark-mode .music-player.in-modal-mode .music-player-pill-title {
+    color: #eee !important;
+}
+
+.music-player.in-modal-mode .music-player-toggle,
+.music-player.in-modal-mode .music-player-collapse,
+.music-player.in-modal-mode .music-player-pill-collapse {
+    display: flex !important;
+}
+
+/* ★★★ 修改点 1：只旋转里面的 i 图标，不旋转整个按钮，防止文字跟着颠倒 ★★★ */
+.music-player.in-modal-mode .music-player-collapse i,
+.music-player.in-modal-mode .music-player-pill-collapse i {
+    transform: rotate(180deg) !important;
+}
+
+.music-player.in-modal-mode .music-player-card {
+    flex-direction: column !important;
+    padding: 15px 12px !important;
+    width: auto !important;
+    min-width: 120px !important;
+    max-width: 140px !important;
+    gap: 12px !important;
+}
+
+.music-player.in-modal-mode .music-player-controls {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+}
+
+.music-player.in-modal-mode .music-player-info {
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.music-player.in-modal-mode .music-player-pill {
+    padding: 15px 10px !important;
+    border-radius: 40px !important;
+}
+
+.music-player.in-modal-mode .music-player-pill-inner {
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+.music-player.in-modal-mode .music-player-pill-divider {
+    width: 30px !important;
+    height: 1px !important;
+    margin: 4px 0 !important;
+}
+
+
+
+/* =========================================================
+   ★★★ 优化竖直模式下的展开/收起动画 ★★★ 
+========================================================= */
+
+/* 面板展开时的初始与过渡状态 */
+.music-player.in-modal-mode .music-player-mini {
+    background: rgba(var(--card-bg-rgb, 255, 255, 255), var(--player-opacity, 0.85)) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+
+    /* 使用更顺滑的弹性曲线 */
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.3s ease,
+        visibility 0.3s !important;
+
+    /* 缩放中心依然对准右侧边缘，但我们结合平移 */
+    transform-origin: right center !important;
+    transform: translateX(0) scale(1) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 面板收起时的状态：向右稍微滑出并轻微缩小，同时渐隐 */
+/* 覆盖默认的 absolute 塌陷 */
+.music-player.in-modal-mode.collapsed .music-player-mini {
+    /* 强制相对定位，保留其占据的宽高空间，避免外层容器失去高度中心点乱跳 */
+    position: relative !important;
+
+    /* 结合我们刚才优化的动画 */
+    transform: translateX(30px) scale(0.85) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* 圆形呼出按钮的过渡动画 */
+.music-player.in-modal-mode .music-player-toggle {
+    position: absolute !important;
+    right: 0 !important;
+    left: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    margin-top: 0 !important;
+
+    /* 展开时（按钮隐藏）：向左侧位移并缩小，避免瞬间消失 */
+    transform: translateY(-50%) translateX(-20px) scale(0.5) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.3s ease,
+        visibility 0.3s !important;
+}
+
+/* 圆形呼出按钮收起时的状态：复位并显示，带轻微的旋转效果增加灵动感 */
+.music-player.in-modal-mode.collapsed .music-player-toggle {
+    transform: translateY(-50%) translateX(0) scale(1) rotate(0deg) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =========================================================
+   ★★★ Tooltip 悬浮文字美化 ★★★ 
+========================================================= */
+.music-player-btn::after,
+.music-player-toggle::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 135%;
+    /* 放在按钮正上方 */
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    /* 居中且稍微缩小 */
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: normal;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 10010;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    line-height: normal;
+    font-family: var(--font-primary, sans-serif);
+}
+
+.music-player-btn:hover::after,
+.music-player-toggle:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+    bottom: 115%;
+}
+
+/* 调整展开按钮的间距 */
+.music-player-toggle::after {
+    bottom: 120%;
+}
+
+.music-player-toggle:hover::after {
+    bottom: 105%;
+}
+
+/* ★★★ 在竖直状态下（in-modal-mode）将气泡改为向左弹出 ★★★ */
+.music-player.in-modal-mode .music-player-btn::after,
+.music-player.in-modal-mode .music-player-toggle::after {
+    bottom: 50%;
+    left: auto;
+    right: 135%;
+    transform: translateY(50%) scale(0.8);
+}
+
+.music-player.in-modal-mode .music-player-btn:hover::after,
+.music-player.in-modal-mode .music-player-toggle:hover::after {
+    transform: translateY(50%) scale(1);
+    bottom: 50%;
+    right: 115%;
+    left: auto;
+}
+
+/* ★★★ 修改点 2：加上 :not 排除竖直模式，确保竖直模式下(无论是否在Header中)气泡统一向左 ★★★ */
+.music-player.in-header:not(.in-modal-mode) .music-player-btn::after,
+.music-player.in-header:not(.in-modal-mode) .music-player-toggle::after {
+    bottom: auto;
+    top: 135%;
+}
+
+.music-player.in-header:not(.in-modal-mode) .music-player-btn:hover::after,
+.music-player.in-header:not(.in-modal-mode) .music-player-toggle:hover::after {
+    top: 115%;
+    bottom: auto;
+}
+
+
+/* ===== Responsive (Mobile) =====
+   手机端播放器形态总览(所有形态都固定在左下角):
+   · 收起态:一个圆形音乐钮;
+   · 展开态-圆条型:横向面板逆时针转 90° 成纵向长条,贴屏幕左边缘
+     向上伸展;面板内按钮/封面顺时针转 90° 保持直立,歌名/作者侧放;
+   · 展开态-卡片型:不旋转,整块悬停在圆钮正上方;
+   · 出现/收起动画统一为"向上弹出 / 向下沉回"(translate + 淡入淡出),
+     旋转是静态的,不参与过渡;
+   · 模态窗口内:维持横向布局,不参与以上任何旋转。 */
+@media (max-width: 768px) {
+
+    /* ---- 0. 基础:固定左下角;触屏不显示悬浮提示 ---- */
+    .music-player-btn::after,
+    .music-player-toggle::after {
+        display: none !important;
+    }
+
+    .music-player,
+    .music-player.in-modal-mode {
+        position: fixed !important;
+        top: auto !important;
+        left: 10px !important;
+        bottom: 10px !important;
+        right: auto !important;
+        margin: 0 !important;
+        transform: none !important;
+        z-index: 2000 !important;
+    }
+
+    /* ---- 1. 圆钮 ---- */
+    .music-player-toggle {
+        width: 42px;
+        height: 42px;
+    }
+
+    .music-player.collapsed .music-player-toggle {
+        position: relative !important;
+        transform: scale(1) !important;
+    }
+
+    .music-player .music-player-toggle:active {
+        transform: scale(0.85) !important; /* 按压动效 */
+    }
+
+    /* 展开态圆钮保持可见:点它即可收起 */
+    .music-player:not(.collapsed):not(.in-modal-mode) .music-player-toggle {
+        position: relative !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: scale(1) !important;
+    }
+
+    /* ---- 2. 面板公共:向上弹出 / 向下沉回 ---- */
+    .music-player:not(.in-modal-mode) .music-player-mini {
+        position: absolute !important;
+        left: 0 !important;
+        right: auto !important;
+        margin: 0 !important;
+        transition: opacity 0.25s ease, visibility 0.25s ease,
+            translate 0.3s cubic-bezier(0.2, 0.9, 0.35, 1.18) !important;
+    }
+
+    /* 收起:沉向圆钮并隐藏(旋转保持不变,不会横竖瞬切) */
+    .music-player.collapsed:not(.in-modal-mode) .music-player-mini {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        translate: 0 34px !important;
+        pointer-events: none !important;
+    }
+
+    /* 展开:从圆钮位置向上弹出 */
+    .music-player:not(.collapsed):not(.in-modal-mode) .music-player-mini {
+        opacity: 1 !important;
+        visibility: visible !important;
+        translate: 0 0 !important;
+    }
+
+    /* ---- 3. 圆条型:旋转成纵向长条 ---- */
+    .music-player:not(.in-modal-mode) .music-player-pill {
+        top: -6px !important; /* 旋转后长条底边正好悬在圆钮上方 6px */
+        bottom: auto !important;
+        transform: rotate(-90deg) !important;
+        transform-origin: left top !important;
+        padding: 5px 8px !important;
+    }
+
+    /* 面板内按钮/封面/分隔线顺时针转 90° 保持直立(歌名/作者依旧侧放) */
+    .music-player:not(.in-modal-mode) .music-player-pill .music-player-btn,
+    .music-player:not(.in-modal-mode) .music-player-pill .music-player-pill-cover,
+    .music-player:not(.in-modal-mode) .music-player-pill .music-player-pill-divider {
+        transform: rotate(90deg) !important;
+    }
+
+    .music-player-pill .music-player-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+
+    .music-player-pill .music-player-play {
+        width: 28px;
+        height: 28px;
+    }
+
+    .music-player-pill-cover {
+        width: 26px;
+        height: 26px;
+    }
+
+    .music-player-pill-info {
+        /* 定宽:纵向长条的长度恒定,不随歌曲名变化 */
+        width: 90px;
+        flex: 0 0 90px;
+    }
+
+    .music-player-pill-title {
+        font-size: 0.75rem;
+    }
+
+    .music-player-pill-artist {
+        font-size: 0.65rem;
+    }
+
+    /* ---- 4. 卡片型:纵向堆叠(大封面/信息/控制键自上而下),悬在圆钮上方 ---- */
+    .music-player:not(.in-modal-mode) .music-player-card {
+        flex-direction: column !important;
+        align-items: center !important;
+        bottom: 62px !important;
+        top: auto !important;
+        transform: none !important;
+        width: 208px !important;
+        max-width: calc(100vw - 20px) !important;
+        padding: 16px 14px 12px !important;
+        gap: 10px !important;
+        border-radius: 16px !important;
+    }
+
+    /* 大封面居中,播放时旋转展示 */
+    .music-player:not(.in-modal-mode) .music-player-cover {
+        width: 92px !important;
+        height: 92px !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    .music-player:not(.in-modal-mode) .music-player-info {
+        width: 100% !important;
+        flex: 0 0 auto !important;
+        text-align: center !important;
+    }
+
+    .music-player:not(.in-modal-mode) .music-player-controls {
+        gap: 16px !important;
+    }
+
+    /* 纵向卡片里隐藏收起箭头(点击圆钮即可收起) */
+    .music-player:not(.in-modal-mode) .music-player-collapse {
+        display: none !important;
+    }
+
+    .music-player-cover {
+        width: 36px;
+        height: 36px;
+    }
+
+    .music-player-title {
+        font-size: 0.8rem;
+    }
+
+    .music-player-artist {
+        font-size: 0.7rem;
+    }
+
+    .music-player-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    .music-player-play {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* ---- 5. 模态窗口内:维持横向布局(不参与旋转/上浮) ---- */
+    .music-player.in-modal-mode .music-player-card,
+    .music-player.in-modal-mode .music-player-pill,
+    .music-player.in-modal-mode .music-player-pill-inner {
+        flex-direction: row !important;
+    }
+
+    .music-player.in-modal-mode .music-player-collapse,
+    .music-player.in-modal-mode .music-player-pill-collapse {
+        display: none !important;
+    }
+
+    .music-player.in-modal-mode .music-player-pill-divider {
+        width: 1px !important;
+        height: 20px !important;
+        margin: 0 6px !important;
+    }
+
+    .music-player.in-modal-mode .music-player-info,
+    .music-player.in-modal-mode .music-player-pill-info {
+        text-align: left !important;
+    }
+
+    .music-player.in-modal-mode.collapsed .music-player-mini {
+        transform: scale(0.8) !important;
+    }
+}
+/* ★ 模态播放器的声波波动图(默认隐藏;仅电脑端模态形态显示,
+   手机端不显示——占位卡保持原样) */
+.music-player .music-wave {
+    display: none;
+    margin: 6px 0;
+}
+
+/* 圆条(纵向):固定尺寸——画布固有尺寸不再撑宽面板 */
+.music-player .music-player-pill .music-wave {
+    width: 56px;
+    height: 90px;
+}
+
+/* 卡片(横向):基础尺寸;模态形态下覆盖为与圆条同规格(见 in-modal-mode 段) */
+.music-player .music-player-card .music-wave {
+    width: 150px;
+    height: 90px;
+}
+
+@media (min-width: 769px) {
+    .music-player.in-modal-mode .music-wave {
+        display: block;
+    }
+}
+
+/* ★★ 模态卡片:紧凑纵向布局(高度=内容,不再拉伸撑出空白);
+   空白区由声波波动图填充(与圆条同尺寸 56×90,不再撑宽卡片),
+   封面/文字/控制键居中 ★★ */
+.music-player.in-modal-mode .music-player-card {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 140px !important;
+    height: fit-content !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 40px) !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 20px) !important;
+    gap: 12px !important;
+    padding: 18px 14px 14px !important;
+}
+
+.music-player.in-modal-mode .music-player-cover {
+    width: 64px !important;
+    height: 64px !important;
+}
+
+.music-player.in-modal-mode .music-player-info {
+    width: 100% !important;
+    flex: 0 0 auto !important;
+    text-align: center !important;
+}
+
+/* 卡片声波与圆条同规格(56×90),居中显示 */
+.music-player.in-modal-mode .music-player-card .music-wave {
+    width: 56px !important;
+    height: 90px !important;
+}
